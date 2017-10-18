@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DotNetCore_EntityFramework_sample
 {
-    [Table("candidates")]
+    [Table("candidates", Schema = "public")]
     public class Candidate
     {
         [Column("id")]
