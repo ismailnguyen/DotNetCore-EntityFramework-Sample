@@ -1,21 +1,44 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 namespace DotNetCore_EntityFramework_sample
 {
-    public class CandidateRepository : DbContext
+    public class CandidateRepository : ICandidateRepository
     {
-        public DbSet<Candidate> Candidates { get; set; }
         private string connectionString;
 
-        public CandidateRepository(string connectionString)
+        public CandidateRepository()
         {
-            this.connectionString = connectionString;
+            connectionString = "Your connection string here";
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public IEnumerable<Candidate> Find()
         {
-            optionsBuilder.UseNpgsql(connectionString);
+            using (var candidateDbContext = new CandidateDbContext(connectionString))
+            {
+                return candidateDbContext.Candidates.ToList();
+            }
+        }
+
+        public IEnumerable<Candidate> Search(string email)
+        {
+            using (var candidateDbContext = new CandidateDbContext(connectionString))
+            {
+                return candidateDbContext.Candidates.Where(c => c.Email.Contains(email)).ToList();
+            }
+        }
+
+        public void Save(string email)
+        {
+            using (var candidateDbContext = new CandidateDbContext(connectionString))
+            {
+                candidateDbContext.Candidates.Add(new Candidate() { Email = email});
+
+                candidateDbContext.SaveChanges();
+            }
         }
     }
 }
